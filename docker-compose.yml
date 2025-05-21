@@ -1,0 +1,11 @@
+version: '3.1'
+
+services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: skillshare
+    ports:
+      - 5432:5432
