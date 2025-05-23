@@ -1,14 +1,13 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { App } from 'supertest/types';
+import { Test } from '@nestjs/testing';
+import { INestApplication } from '@nestjs/common';
 import { AppModule } from './../src/app.module';
 
 describe('AppController (e2e)', () => {
-  let app: INestApplication<App>;
+  let app: INestApplication;
 
-  beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
+  beforeAll(async () => {
+    const moduleFixture = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
@@ -16,10 +15,21 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  it('/auth/signup (POST) - registers new user', async () => {
+    const res = await request(app.getHttpServer()).post('/auth/signup').send({
+      email: 'testuser@example.com',
+      password: 'password123',
+      userType: 'user',
+      firstName: 'Test',
+      lastName: 'User',
+      phone: '1234567890',
+      address: '123 Street Name, City, ST, 12345',
+    });
+    expect(res.status).toBe(201);
+    expect(res.body.email).toBe('testuser@example.com');
+  });
+
+  afterAll(async () => {
+    await app.close();
   });
 });

@@ -1,24 +1,40 @@
-import { Controller, Post, Body, Put, Param, Get } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Put,
+  Param,
+  Get,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { SkillsService } from './skills.service';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('skills')
 export class SkillsController {
-  constructor(private readonly skillService: SkillsService) {}
+  constructor(private readonly skillsService: SkillsService) {}
 
   @Post()
-  createSkill(@Body() dto: CreateSkillDto) {
-    return this.skillService.create(dto);
+  @Roles('provider')
+  create(@Body() dto: CreateSkillDto, @Request() req) {
+    return this.skillsService.create(dto, req.user.id);
   }
 
   @Put(':id')
-  updateSkill(@Param('id') id: string, @Body() dto: UpdateSkillDto) {
-    return this.skillService.update(+id, dto);
+  @Roles('provider')
+  update(@Param('id') id: string, @Body() dto: UpdateSkillDto, @Request() req) {
+    return this.skillsService.update(+id, dto, req.user.id);
   }
 
-  @Get('provider/:providerId')
-  getSkillsByProvider(@Param('providerId') providerId: string) {
-    return this.skillService.findByProvider(+providerId);
+  @Get('me')
+  @Roles('provider')
+  findMySkills(@Request() req) {
+    return this.skillsService.findByProvider(req.user.id);
   }
 }

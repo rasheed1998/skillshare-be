@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
@@ -21,20 +18,26 @@ export class AuthService {
       throw new UnauthorizedException('Email already in use');
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     const hashedPassword = await bcrypt.hash(dto.password, 10);
     const newUser = await this.usersService.create({
       ...dto,
       password: hashedPassword,
     });
 
+    // ✅ Normalize userType to 'user' or 'provider' for JWT
+    const role =
+      newUser.userType === 'individual' || newUser.userType === 'company'
+        ? 'user'
+        : 'provider';
+
     const payload = {
       sub: newUser.id,
       email: newUser.email,
-      role: newUser.userType,
+      role,
     };
+
     const token = this.jwtService.sign(payload);
-    return { access_token: token, userId: newUser.id, role: newUser.userType };
+    return { access_token: token, userId: newUser.id, role };
   }
 
   async login(dto: LoginDto) {
@@ -43,12 +46,19 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    // ✅ Normalize userType to 'user' or 'provider' for JWT
+    const role =
+      user.userType === 'individual' || user.userType === 'company'
+        ? 'user'
+        : 'provider';
+
     const payload = {
       sub: user.id,
       email: user.email,
-      role: user.userType,
+      role: user.userType, // 'individual' or 'company'
     };
+
     const token = this.jwtService.sign(payload);
-    return { access_token: token, userId: user.id, role: user.userType };
+    return { access_token: token, userId: user.id, role };
   }
 }

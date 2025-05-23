@@ -1,12 +1,12 @@
-import { IsString, IsNumber, IsDateString } from 'class-validator';
+import {
+  IsString,
+  IsDateString,
+  IsNumber,
+  IsIn,
+  IsArray,
+} from 'class-validator';
 
 export class CreateTaskDto {
-  @IsNumber()
-  userId: number;
-
-  @IsString()
-  category: string;
-
   @IsString()
   name: string;
 
@@ -14,7 +14,7 @@ export class CreateTaskDto {
   description: string;
 
   @IsDateString()
-  startDate: string;
+  startDate: Date;
 
   @IsNumber()
   hours: number;
@@ -22,6 +22,10 @@ export class CreateTaskDto {
   @IsNumber()
   rate: number;
 
-  @IsString()
+  @IsIn(['USD', 'AUD', 'SGD', 'INR'])
   currency: 'USD' | 'AUD' | 'SGD' | 'INR';
+
+  @IsArray()
+  @IsNumber({}, { each: true })
+  categoryIds: number[];
 }

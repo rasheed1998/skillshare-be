@@ -1,10 +1,13 @@
-import { IsString, IsNumber, IsOptional, IsDateString } from 'class-validator';
+import {
+  IsString,
+  IsDateString,
+  IsNumber,
+  IsOptional,
+  IsIn,
+  IsArray,
+} from 'class-validator';
 
 export class UpdateTaskDto {
-  @IsOptional()
-  @IsString()
-  category?: string;
-
   @IsOptional()
   @IsString()
   name?: string;
@@ -15,7 +18,7 @@ export class UpdateTaskDto {
 
   @IsOptional()
   @IsDateString()
-  startDate?: string;
+  startDate?: Date;
 
   @IsOptional()
   @IsNumber()
@@ -26,6 +29,11 @@ export class UpdateTaskDto {
   rate?: number;
 
   @IsOptional()
-  @IsString()
-  currency?: string;
+  @IsIn(['USD', 'AUD', 'SGD', 'INR'])
+  currency?: 'USD' | 'AUD' | 'SGD' | 'INR';
+
+  @IsOptional()
+  @IsArray()
+  @IsNumber({}, { each: true })
+  categoryIds?: number[];
 }

@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Task } from '../tasks/task.entity';
 
 @Entity()
 export class Offer {
@@ -12,8 +13,8 @@ export class Offer {
   taskId: number;
 
   @Column()
-  proposedRate: number;
-
-  @Column({ default: 'pending' })
   status: 'pending' | 'accepted' | 'rejected';
+
+  @ManyToOne(() => Task, (task) => task.offers, { eager: true })
+  task: Task;
 }

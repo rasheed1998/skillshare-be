@@ -1,15 +1,27 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  ManyToMany,
+  JoinTable,
+  CreateDateColumn,
+  OneToMany,
+} from 'typeorm';
+import { User } from '../users/user.entity';
+import { Category } from '../categories/category.entity';
+import { Offer } from '../offers/offer.entity';
 
 @Entity()
 export class Task {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  userId: number;
+  @ManyToOne(() => User, { eager: true })
+  user: User;
 
   @Column()
-  category: string;
+  userId: number; // ✅ Enables easy filtering and validation
 
   @Column()
   name: string;
@@ -29,12 +41,19 @@ export class Task {
   @Column()
   currency: string;
 
-  @Column({ default: 'posted' })
-  status: 'posted' | 'in_progress' | 'completed' | 'accepted' | 'rejected';
+  @Column({ default: 'open' })
+  status: 'open' | 'in_progress' | 'completed' | 'accepted' | 'rejected';
 
   @Column({ nullable: true })
-  progressUpdate?: string;
+  progress?: string;
 
-  @Column({ nullable: true })
-  progressTimestamp?: Date;
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @ManyToMany(() => Category, (category) => category.tasks, { cascade: true })
+  @JoinTable()
+  categories: Category[];
+
+  @OneToMany(() => Offer, (offer) => offer.task)
+  offers: Offer[];
 }

@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
+import { Category } from '../categories/category.entity';
 
 @Entity()
 export class Skill {
@@ -9,14 +16,15 @@ export class Skill {
   providerId: number;
 
   @Column()
-  category: string;
-
-  @Column()
   experience: string;
 
   @Column()
-  nature: 'onsite' | 'online';
+  nature: 'online' | 'onsite';
 
   @Column()
   hourlyRate: number;
+
+  @ManyToMany(() => Category, (category) => category.skills, { cascade: true })
+  @JoinTable()
+  categories: Category[];
 }

@@ -1,18 +1,16 @@
-import { IsString, IsNumber, IsIn } from 'class-validator';
+import { IsString, IsNumber, IsIn, IsArray } from 'class-validator';
 
 export class CreateSkillDto {
-  @IsNumber()
-  providerId: number;
-
-  @IsString()
-  category: string;
-
   @IsString()
   experience: string;
 
-  @IsIn(['onsite', 'online'])
-  nature: 'onsite' | 'online';
+  @IsIn(['online', 'onsite'])
+  nature: 'online' | 'onsite';
 
   @IsNumber()
   hourlyRate: number;
+
+  @IsArray()
+  @IsNumber({}, { each: true })
+  categoryIds: number[];
 }
